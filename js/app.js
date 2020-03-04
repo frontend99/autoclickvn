@@ -133,7 +133,7 @@
             pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - q không phải là số nguyên tố`;
         else if(primeNumber(p)==false)
             pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - p không phải là số nguyên tố`;
-        else if(M>n || M==n)
+        else if(M>p*q || M==p*q)
             pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - M phải nhỏ hơn p*q`;
         else{
             var n = p*q;
