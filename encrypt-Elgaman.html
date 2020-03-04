@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi"><head>
-    <title>Modulo Tool</title>
+    <title>Encrypt Elgaman</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">  
     <link rel="stylesheet" href="vendor/bootstrap.css">
@@ -22,7 +22,7 @@
         <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
           <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" href="index.html">Home</a>
+              <a class="nav-link" href="index.html">Home</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="mod-calculator.html">A^B mod C</a>
@@ -43,28 +43,42 @@
               <a class="nav-link" href="encrypt-Diffie-Hellman.html">MH Diffie-Hellman</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="encrypt-Elgaman.html">MH Elgaman</a>
+              <a class="nav-link active" href="encrypt-Elgaman.html">MH Elgaman</a>
             </li>
           </ul>
         </div>
     </nav>
-    <h4 class="text-center mt-5 mb-5 line-height">MODULO CHECK TOOL <br> công cụ tính nhanh, kiểm tra Modulo</h4>
-    <p class="text-center pc mt-5 line-height">- Tính A^B mod C (với số mũ lớn)
-                          <br>- Tính nhanh nghịch đảo modulo
-                          <br>- Kiểm tra căn nguyên thủy
-                          <br>- Tính Logarit rời rạc modulo
-                          <br>- Mã công khai RSA
-                          <br>- Trao đổi khoá Diffie-Hellman
-                          <br>- Mật mã Elgaman
-    </p>
-    <div class="mobile">
-      <h5 class="text-center" style="color: red;">Sử dụng chức năng tại MENU nhé</h5>
-    </div>
-
-    <footer class="text-center line-height">
-      <p>© Copyright 2020. All rights reserved.
-        <br><b>Modulo Tool</b> is created by <a href="https://facebook.com/ducnh99" target="_blank" class="author">Nguyễn Đức</a></p>
-    </footer>
+    <div class="encrypt-E col-sm-5 text-center">
+      <h3 class="mt-5 mb-5">Mã hóa công khai Diffie-Hellman</h3>
+      <form onsubmit="return encryptElgaman();" id="form7">
+          <div class="row">
+              <div class="form-group col-sm-6">
+                  <input type="number" class="form-control A5"  placeholder="Nhập q" id="input-encryptE-Q7">
+                  <label for="input-encryptRSA-A5">(q là số nguyên tố)</label>
+              </div>
+              <div class="form-group col-sm-6">
+                  <input type="number" class="form-control B5"  placeholder="Nhập a" id="input-encryptE-A7">
+                  <label for="input-encryptRSA-A5">(a là căn nguyên thủy của q)</label>
+              </div>
+              <div class="form-group col-sm-6">
+                <input type="number" class="form-control A5"  placeholder="Nhập khóa riêng Xᴀ" id="input-encryptE-XA7">
+                <label for="input-encryptRSA-A5">(Xᴀ < q-1)</label>
+            </div>
+            <div class="form-group col-sm-6">
+                <input type="number" class="form-control B5"  placeholder="Nhập k ngẫu nhiên" id="input-encryptE-K7">
+                <label for="input-encryptRSA-A5">(k < q)</label>
+            </div>
+            <div class="row col-sm-12">
+              <div class="form-group col-sm-6 mg-center">
+                <input type="number" class="form-control A5"  placeholder="Nhập bản gốc M" id="input-encryptE-M7">
+                <label for="input-encryptRSA-A5">(M < q)</label>
+            </div>
+              </div>
+              <button type="submit" class="btn btn-primary col-sm-3 mt-5 mb-5 button1" onclick="">XEM KẾT QUẢ</button>
+              <h4 class="mb-2 col-sm-12" id="result-encrypt-E" style="color:red;line-height: 30px;"></h4>
+          </div>
+      </form>
+  </div>
 	<script type="text/javascript" src="vendor/bootstrap.min.js"></script>
     <script type="text/javascript" src="vendor/jquery-3.4.1.js"></script>
 	<script type="text/javascript" src="js/app.js" ></script>

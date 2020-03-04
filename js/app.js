@@ -12,8 +12,30 @@
         $('#form4').on('submit', function(e) {
             e.preventDefault();
         });
+        $('#form5').on('submit', function(e) {
+            e.preventDefault();
+        });
+        $('#form6').on('submit', function(e) {
+            e.preventDefault();
+        });
+        $('#form7').on('submit', function(e) {
+            e.preventDefault();
+        });
     });
 
+    // tìm UCLN
+    gcd = (a,b) => {
+        if (a == 0 || b == 0){
+            return a + b;
+        }
+        while(a!=b){
+            if(a>b) a = a-b;
+            else b = b-a;
+        }
+        return a;
+    }
+
+    // web A^B mod C
     modCalculator = () => {
         var p1 = document.getElementById("result-mod-calculator");
         var inputA1 = document.getElementById("input-mod-calculator-A").value;
@@ -43,24 +65,202 @@
         }
     }
 
-
-    // code Javascript x^n mod m
-    recursiveModCalculator = (x,n,m) => {
+    // A^B mod C
+    recursiveModCalculator = (x,y,z) => {
         var p = null;
-        var q = parseInt(n/2);
-        if (n==0)
+        var q = parseInt(y/2);
+        if (y==0)
             return 1;
         else {
-            p=parseInt(recursiveModCalculator(x,q,m));
-            if (n%2==0) 
-                return (p*p)%m;
+            p=parseInt(recursiveModCalculator(x,q,z));
+            if (y%2==0) 
+                return (p*p)%z;
             else
-                return (p*p*x)%m;
+                return (p*p*x)%z;
+        }
+    }
+
+    // check căn nguyên thủy
+    modPrimitiveRoot2 = (A3,B3) => {
+        var Result3 = B3-1;
+        for(var i=1;i<Result3;i++){
+            var check3 = recursiveModCalculator(A3,i,B3);
+            if(check3 && check3==1){
+                Result3 = i;
+            }
+            else
+                Result3 = B3-1;
+        }
+        if(Result3!=B3-1){
+            return false;
+        }
+        else if(Result3==B3-1)
+            return true;
+    }
+
+    // tìm nghịch đảo
+    modInverse2 = (A2,B2) => {
+        var Result = null;
+        for(var i=1;i<B2;i++){
+            if((A2*i-1)%B2 == 0)
+                Result = i;
+        }
+        if(Result != null) return Result;
+    }
+    
+    // mã hóa RSA
+    // đầu vào p,q là số nguyên tố
+    // ta được
+    // Khóa công khai PU = {e, n}
+    // Khóa riêng PR = {d, n}
+    // đầu vào bản rõ M < n
+    // ta được
+    // đầu ra bản mã C = M^e mod n
+    // Giải mã: M = C^d mod n = bản rõ M đầu vào
+    encryptRSA = () => {
+        var pKey = document.getElementById("p-key-RSA");
+        var pResult = document.getElementById("result-encrypt-RSA");
+        var inputP = document.getElementById("input-encryptRSA-P5").value;
+        var inputQ = document.getElementById("input-encryptRSA-Q5").value;
+        var inputM = document.getElementById("input-encryptRSA-M5").value;
+        var p = parseInt(inputP);
+        var q = parseInt(inputQ);
+        var M = parseInt(inputM);
+        
+        if(inputP=="" || inputQ=="" || inputM=="")
+            pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - Chưa nhập đủ số`;
+        else if(primeNumber(q)==false)
+            pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - q không phải là số nguyên tố`;
+        else if(primeNumber(p)==false)
+            pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - p không phải là số nguyên tố`;
+        else if(M>n || M==n)
+            pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - M phải nhỏ hơn p*q`;
+        else{
+            var n = p*q;
+            var eulerN = (p-1)*(q-1);
+            var arrGCD = [];
+            for(var i=1;i<eulerN;i++){
+                if(i!=1 && gcd(eulerN,i) == 1)
+                arrGCD.push(i);
+            }
+            if(arrGCD[2])
+                e = arrGCD[1];
+            else e = arrGCD[0];
+            var d = modInverse2(e,eulerN);
+            var C = recursiveModCalculator(M,e,n);
+            var M2 = recursiveModCalculator(C,d,n);
+            pKey.innerHTML = `Sinh khóa công khai PU = {e,p*q} = {${e},${n}} <br> Sinh khoá riêng PR = {d,p*q} = {${d},${n}}`;
+            pResult.innerHTML = `Bản mã C = ${C} <br> Giải mã: M = C^d mod (p*q) = ${M2}`;
         }
     }
     
-    
+    //check số nguyên tố
+    function primeNumber(n){
+        if (n < 2){
+            return false;
+        }
+        else{
+            for(var i=2;i<n-1;i++){
+                if (n%i == 0){
+                    return false;
+                }    
+            }
+        }
+        return true;
+    }
 
+    // mã hóa Diffie-Hellman
+    // đầu vào q là SNT, a là CNT của q
+    // đầu vào xA < q, xB < q
+    // đầu ra Ya Yb
+    // đầu ra là khóa K = recursiveModCalculator(yB,xA,q) = (yA,xB,q)
+    encryptDiffieHellman = () => {
+        var pResult = document.getElementById("result-encrypt-DH");
+        var inputQ = document.getElementById("input-encryptDH-Q5").value;
+        var inputA = document.getElementById("input-encryptDH-A5").value;
+        var inputXA = document.getElementById("input-encryptDH-XA5").value;
+        var inputXB = document.getElementById("input-encryptDH-XB5").value;
+        var a = parseInt(inputA);
+        var q = parseInt(inputQ);
+        var xA = parseInt(inputXA);
+        var xB = parseInt(inputXB);
+        if(inputA=="" || inputQ=="" || inputXA=="" || inputXB=="")
+            pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - Chưa nhập đủ số`;
+        else if(!primeNumber(q)){
+            pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - q không phải là số nguyên tố`;
+        }
+        else if(modPrimitiveRoot2(a,q) == false){
+            pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - a không phải là căn nguyên thủy của q <br> Hãy sử dụng chức năng Căn nguyên thủy trên Menu`;
+        }
+        else if(xA = q || xA > q){
+            pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - Xᴀ phải nhỏ hơn q`;
+        }
+        else if(xB = q || xB > q){
+            pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - Xʙ phải nhỏ hơn q`;
+        }
+        else{
+            var yA = recursiveModCalculator(a,xA,q);
+            var yB = recursiveModCalculator(a,xB,q);
+            var K = recursiveModCalculator(yB,xA,q);
+            pResult.innerHTML = `Khóa công khai Yᴀ = ${yA} <br>Khóa công khai Yʙ = ${yB} <br>Khóa bí mật chung K = ${K}`
+            //console.log(recursiveModCalculator(yA,xB,q));
+        }
+    }
+ 
+    // Mật mã Elgaman
+    // đầu vào q là SNT, a là CNT của q
+    // đầu vào khóa riêng xA < q - 1
+    // đầu vào bản gốc M < q
+    // đầu vào k < q
+    // đầu ra Khóa công khai: PU = {q, a, yA}
+    // đầu ra Bản mã (C1, C2)
+    // giải mã
+    // đầu ra K
+    // đầu ra M
+    encryptElgaman = () => {
+        var pResult = document.getElementById("result-encrypt-E");
+        var inputQ = document.getElementById("input-encryptE-Q7").value;
+        var inputA = document.getElementById("input-encryptE-A7").value;
+        var inputK = document.getElementById("input-encryptE-K7").value;
+        var inputM = document.getElementById("input-encryptE-M7").value;
+        var inputXA = document.getElementById("input-encryptE-XA7").value;
+        var a = parseInt(inputA);
+        var q = parseInt(inputQ);
+        var xA = parseInt(inputXA);
+        var k = parseInt(inputK);
+        var M = parseInt(inputM);
+        if(inputA=="" || inputQ=="" || inputXA=="" || inputK=="" || inputM=="")
+            pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - Chưa nhập đủ số`;
+        else if(!primeNumber(q)){
+            pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - q không phải là số nguyên tố`;
+        }
+        else if(modPrimitiveRoot2(a,q) == false){
+            pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - a không phải là căn nguyên thủy của q <br> Hãy sử dụng chức năng Căn nguyên thủy trên Menu`;
+        }
+        else if(xA > q - 1){
+            pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - Xᴀ phải nhỏ hơn q-1`;
+        }
+        else if(M == q || M > q){
+            pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - M phải nhỏ hơn q`;
+        }
+        else if(k == q || k > q){
+            pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - k phải nhỏ hơn q`;
+        }
+        
+        else{
+            var yA = recursiveModCalculator(a,xA,q);
+            var KK = recursiveModCalculator(yA,k,q);
+            var C1 = recursiveModCalculator(a,k,q);
+            var KM = KK*M;
+            var C2 = recursiveModCalculator(KM,1,q);
+            var inverseK = modInverse2(KK,q);
+            var C2inverseK = C2 * inverseK;
+            var M2 = recursiveModCalculator(C2inverseK,1,q);
+            pResult.innerHTML = `Khóa công khai: PU = {q, a, Yᴀ} = {${q},${a},${yA}} <br>Bản mã (C₁,C₂) = (${C1},${C2}) <br>Khóa bí mật chung K = C₁^Xᴀ mod q = ${KK} <br>Bản rõ: M = (C₂ * K^(-1)) mod q = ${M2}`;
+        }
+    }
+    
+    // thuật toán tìm nghịch đảo modulo tương tự Brute force
     modInverse = () => {
         var p2 = document.getElementById("result-mod-inverse");
         var inputA2 = document.getElementById("input-mod-inverse-A").value;
@@ -102,6 +302,9 @@
         }
         if(inputA3=="" || inputB3=="" )
             p3.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - Chưa nhập đủ số`;
+        else if(primeNumber(B3) == false){
+            p3.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - B không phải là số nguyên tố`;
+        }
         else {
             if(Result3!=B3-1){
                 p3.innerHTML = `KHÔNG - vì tồn tại <br> ${A3}^${Result3} mod ${B3} = 1`;
