@@ -192,10 +192,10 @@
         else if(modPrimitiveRoot2(a,q) == false){
             pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - a không phải là căn nguyên thủy của q <br> Hãy sử dụng chức năng Căn nguyên thủy trên Menu`;
         }
-        else if(xA = q || xA > q){
+        else if(xA == q || xA > q){
             pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - Xᴀ phải nhỏ hơn q`;
         }
-        else if(xB = q || xB > q){
+        else if(xB == q || xB > q){
             pResult.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - Xʙ phải nhỏ hơn q`;
         }
         else{
