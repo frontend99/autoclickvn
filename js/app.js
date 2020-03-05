@@ -307,28 +307,46 @@
         var inputB3 = document.getElementById("input-mod-primitive-root-B").value;
         var A3 = parseInt(inputA3);
         var B3 = parseInt(inputB3);
-        var Result3 = B3-1;
-        for(var i=1;i<Result3;i++){
-            var check3 = recursiveModCalculator(A3,i,B3);
-            if(check3 && check3==1){
-                Result3 = i;
-            }
-            else
-                Result3 = B3-1;
+        var pr = null;
+        var check = false;
+        var m = phi(B3);
+        for(var i=1;i<m;i++){
+            if(recursiveModCalculator(A3,i,B3) == 1)
+                pr = i;
         }
+        if(pr==null)
+            pr = A3;
+        if(pr==A3 && gcd(A3,B3) == 1 && recursiveModCalculator(A3,m,B3) == 1)
+            check = true;
         if(inputA3=="" || inputB3=="" )
             p3.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - Chưa nhập đủ số`;
-        else if(primeNumber(B3) == false){
-            p3.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i> ERROR - B không phải là số nguyên tố`;
-        }
         else {
-            if(Result3!=B3-1){
-                p3.innerHTML = `KHÔNG - vì tồn tại <br> ${A3}^${Result3} mod ${B3} = 1`;
+            if(check==false){
+                p3.innerHTML = `KHÔNG - Căn nguyên thủy của ${B3} là ${pr}`;
             }
-            else if(Result3==B3-1)
+            else if(check==true)
                 p3.innerHTML = `CÓ nha <i class="fas fa-heart ml-2"></i>`;
         } 
     }
+    
+
+    // tính giá trị phi hàm Euler
+    function phi(n) {
+        var res = n;
+        for (var i=2;i*i<=n;++i) {
+            if (n%i == 0) {
+                while(n%i == 0) {
+                    n /= i;
+                }
+                res -= res/i;
+            }
+        }
+        if (n != 1) {
+            res -= res/n;
+        }
+        return res;
+    }
+    
 
     modLogarit = () => {
         var p4 = document.getElementById("result-mod-logarit");
