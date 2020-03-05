@@ -110,15 +110,15 @@
     
     // mã hóa RSA
     // đầu vào p,q là số nguyên tố
-    // ta được
+    // n = p*q
+    // chọn e thỏa mãn: gcd (euler(n), e) = 1
+    // d là nghịch đảo của e theo mod euler(n)
     // Khóa công khai PU = {e, n}
     // Khóa riêng PR = {d, n}
     // đầu vào bản rõ M < n
-    // ta được
     // đầu ra bản mã C = M^e mod n
     // Giải mã: M = C^d mod n = bản rõ M đầu vào
     encryptRSA = () => {
-        var pKey = document.getElementById("p-key-RSA");
         var pResult = document.getElementById("result-encrypt-RSA");
         var inputP = document.getElementById("input-encryptRSA-P5").value;
         var inputQ = document.getElementById("input-encryptRSA-Q5").value;
@@ -149,8 +149,9 @@
             var d = modInverse2(e,eulerN);
             var C = recursiveModCalculator(M,e,n);
             var M2 = recursiveModCalculator(C,d,n);
-            pKey.innerHTML = `Sinh khóa công khai PU = {e,p*q} = {${e},${n}} <br> Sinh khoá riêng PR = {d,p*q} = {${d},${n}}`;
-            pResult.innerHTML = `Bản mã C = ${C} <br> Giải mã: M = C^d mod (p*q) = ${M2}`;
+            pResult.innerHTML = `<span style="color:green;">Sinh khóa <br>n = p*q = ${n} <br>Φ(n) = ${eulerN} <br> Chọn e NTCN với Φ(n) = ${e} <br>
+            d ≡ e^-1(mod Φ(n)) = ${d} <br>PU = {e,n} = {${e},${n}} <br>PR = {d,n} = {${d},${n}}<br>
+            Bản mã C = M^e mod n = ${C} </span> <br> Giải mã <br> M = C^d mod n = ${M2}`;
         }
     }
     
@@ -169,11 +170,17 @@
         return true;
     }
 
-    // mã hóa Diffie-Hellman
-    // đầu vào q là SNT, a là CNT của q
-    // đầu vào xA < q, xB < q
-    // đầu ra Ya Yb
-    // đầu ra là khóa K = recursiveModCalculator(yB,xA,q) = (yA,xB,q)
+    // Trao đổi khoá Diffie-Hellman
+    // đầu vào q là số nguyên tố
+    // a là căn nguyên thủy của q
+    // đầu vào khóa riêng xA < q
+    // đầu vào khóa riêng xB < q
+    // khóa công khai yA = a^xA mod q
+    // khóa công khai yB = a^xB mod q
+    // Alice chọn xA và gửi cho Bob yA
+    // Bob chọn xB và gửi cho Alice yB
+    // khi có yA và yB, sẽ tính ra được khóa K bí mật chung
+    // khóa K = yB^xA mod q = yA^xB mod q
     encryptDiffieHellman = () => {
         var pResult = document.getElementById("result-encrypt-DH");
         var inputQ = document.getElementById("input-encryptDH-Q5").value;
@@ -202,21 +209,27 @@
             var yA = recursiveModCalculator(a,xA,q);
             var yB = recursiveModCalculator(a,xB,q);
             var K = recursiveModCalculator(yB,xA,q);
-            pResult.innerHTML = `Khóa công khai Yᴀ = ${yA} <br>Khóa công khai Yʙ = ${yB} <br>Khóa bí mật chung K = ${K}`
+            pResult.innerHTML = `<span style="color:green;">Sinh khóa <br> Yᴀ = a^Xᴀ mod q = ${yA} <br>Yʙ = a^Xʙ mod q = ${yB} </span>
+            <br>Khóa bí mật K = Yʙ^Xᴀ mod q = Yᴀ^Xʙ mod q = ${K}`
             //console.log(recursiveModCalculator(yA,xB,q));
         }
     }
  
     // Mật mã Elgaman
-    // đầu vào q là SNT, a là CNT của q
+    // đầu vào q là số nguyên tố
+    // a là căn nguyên thủy của q
     // đầu vào khóa riêng xA < q - 1
     // đầu vào bản gốc M < q
-    // đầu vào k < q
+    // đầu vào k < q, k ngẫu nhiên
+    // yA = a^xA mod q
     // đầu ra Khóa công khai: PU = {q, a, yA}
+    // C1= a^k mod q
+    // K = yA^k mod q
+    // C2 = KM mod q
     // đầu ra Bản mã (C1, C2)
     // giải mã
-    // đầu ra K
-    // đầu ra M
+    // K = C1^xA mod q
+    // M = (C2 * K^-1) mod q
     encryptElgaman = () => {
         var pResult = document.getElementById("result-encrypt-E");
         var inputQ = document.getElementById("input-encryptE-Q7").value;
@@ -249,14 +262,17 @@
         
         else{
             var yA = recursiveModCalculator(a,xA,q);
-            var KK = recursiveModCalculator(yA,k,q);
+            var K1 = recursiveModCalculator(yA,k,q);
             var C1 = recursiveModCalculator(a,k,q);
-            var KM = KK*M;
+            var KM = K1*M;
             var C2 = recursiveModCalculator(KM,1,q);
-            var inverseK = modInverse2(KK,q);
+            var K2 = recursiveModCalculator(C1,xA,q);
+            var inverseK = modInverse2(K1,q);
             var C2inverseK = C2 * inverseK;
             var M2 = recursiveModCalculator(C2inverseK,1,q);
-            pResult.innerHTML = `Khóa công khai: PU = {q, a, Yᴀ} = {${q},${a},${yA}} <br>Bản mã (C₁,C₂) = (${C1},${C2}) <br>Khóa bí mật chung K = C₁^Xᴀ mod q = ${KK} <br>Bản rõ: M = (C₂ * K^(-1)) mod q = ${M2}`;
+            pResult.innerHTML = `<span style="color:green;">Sinh khóa: <br>Yᴀ = a^Xᴀ mod q = ${yA} <br> K = Yᴀ^k mod q = ${K1} <br>PU = {q, a, Yᴀ} = {${q},${a},${yA}} <br> 
+            C₁ = a^k mod q = ${C1}<br> C₂ = K * M mod q = ${C2} <br> Bản mã (C₁,C₂) = (${C1},${C2}) <br></span>
+            Giải mã: <br>Khóa bí mật K = C₁^Xᴀ mod q = ${K2} <br>Bản rõ: M = (C₂ * K^(-1)) mod q = ${M2}`;
         }
     }
     
